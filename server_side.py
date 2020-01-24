@@ -4,7 +4,7 @@ import threading
 HOST = 'localhost'
 PORT = 64231
 
-def process_connection(sock, another_sock):
+def process_connection(sock, all_connections):
     while True:
         print(sock)
         print(addr)
@@ -12,8 +12,11 @@ def process_connection(sock, another_sock):
         print(data)
         decoded_data = data.decode('utf-8')  # декодируем
         print(decoded_data)
-        sock.sendall(data)  # эхо
-        another_sock.sendall(data)
+        # sock.sendall(data)  # эхо (отправляем сообщение себе)
+        # another_sock.sendall(data)  # отправляем сообщение клиенту (другому)
+        for conn in all_connections:
+            conn.sendall(data)  # отправляем сообщение всем
+
 
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:  # создали object socket
@@ -21,11 +24,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:  # созда�
     server.bind((HOST, PORT))  # поднимаем сервер
     server.listen()  # сервер может читать
 
-    connection, addr = server.accept()  # ожидаем пока кто-то снаружи постучится по адресу (возвращает соединение и адрес)
-    another_connection, addr = server.accept()
+    connections = []
 
-    threading.Thread(target=process_connection, args=(connection, another_connection)).start()
-    threading.Thread(target=process_connection, args=(another_connection, connection)).start()
+    while True:
+            connection, addr = server.accept()  # ждем пока кто-то снаружи постучится по адресу (возвращает соединение и адрес)
+            connections.append(connection)
+            threading.Thread(target=process_connection, args=(connection, connections)).start()
+        # another_connection, addr = server.accept()
+
     #  while True:
     #     print(addr)
     #     data = connection.recv(1024)  # размер (байт) ждем пока напишут
