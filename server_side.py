@@ -2,7 +2,7 @@ import socket
 import threading
 
 HOST = 'localhost'
-PORT = 12345
+PORT = 64232
 
 
 def process_connection(sock, all_connections):

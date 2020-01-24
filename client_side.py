@@ -6,7 +6,7 @@ from oop.gui import Example
 
 HOST = 'localhost'
 # HOST = 'aud21-prep'
-PORT = 12345
+PORT = 64232
 
 
 def receive_data(sock, window):
